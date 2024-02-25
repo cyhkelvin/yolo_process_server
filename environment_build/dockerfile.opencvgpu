@@ -1,0 +1,47 @@
+FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Asia/Taipei apt-get install -y build-essential cmake unzip wget pkg-config && \
+    apt install --no-install-recommends -y python3.8 python3-pip python3-dev && \
+    apt-get install -y libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libblas-dev liblapack-dev gfortran && \
+    pip install numpy procbridge==1.2.2 PyYAML==6.0.1
+
+WORKDIR /root/
+RUN wget https://github.com/opencv/opencv/archive/refs/tags/4.8.0.zip && unzip 4.8.0.zip && mv opencv-4.8.0 opencv && rm 4.8.0.zip && \
+    wget https://github.com/opencv/opencv_contrib/archive/refs/tags/4.8.0.zip && unzip 4.8.0.zip && mv opencv_contrib-4.8.0 opencv_contrib && rm 4.8.0.zip && \
+    mkdir /root/opencv/build
+
+WORKDIR /root/opencv/build
+RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D INSTALL_PYTHON_EXAMPLES=ON \
+    -D INSTALL_C_EXAMPLES=OFF \
+    -D OPENCV_ENABLE_NONFREE=ON \
+    -D WITH_CUDA=ON \
+    -D WITH_CUDNN=ON \
+    -D OPENCV_DNN_CUDA=ON \
+    -D ENABLE_FAST_MATH=1 \
+    -D CUDA_FAST_MATH=1 \
+    -D CUDA_ARCH_BIN=8.6 \
+    -D WITH_CUBLAS=1 \
+    -D OPENCV_EXTRA_MODULES_PATH=/root/opencv_contrib/modules \
+    -D HAVE_opencv_python3=ON \
+    -D PYTHON_EXECUTABLE=/usr/bin/python3 \
+    -D BUILD_EXAMPLES=ON .. && \
+    make -j8 && \
+    make install && \
+    ldconfig && \
+    ln -s /usr/local/lib/python3.8/site-packages/cv2/python-3.8/cv2.cpython-38-x86_64-linux-gnu.so /usr/local/lib/python3.8/site-packages/cv2.so && \
+    cd /root && \
+    rm -rf opencv* && \
+    mkdir -p /home/object-detection/runs && \
+    apt clean && \
+    apt remove -y wget unzip
+ENV PYTHONPATH=/usr/local/lib/python3.8/site-packages:$PYTHONPATH
+
+WORKDIR /home/object-detection
+COPY detector.py detect_server.py aips_1012.yaml test.onnx ./
+CMD ["python3", "detect_server.py", "--port", "8888s"]
+
+# docker build -t yihsuan:object_detection_server -f dockerfile.opencvgpu .
+# sudo docker run -v <local path>:/home/object-detection --name <name> -p <port>:8888 yihsuan:object_detection_server
+# python3.7 client_simple.py --source <file in local path>
