@@ -1,6 +1,10 @@
 # yolo_process_server
 yolo series model inferenced with opencv backend and maintain service docker image
-
+  - [installation](#installation)
+  - [demo](#demo)
+  - [data preparation](#data-preparation)
+  - [model training](#model-training)
+  - [reference](#reference)
 
 ## installation
 ### step-by-step build up environment on windows
@@ -13,6 +17,24 @@ yolo series model inferenced with opencv backend and maintain service docker ima
   - docker file for opencv-onnx
 
 ## demo
+  - ####todo####
+
+## data preparation
+
+### labelImg for object detection data labeling
+  - https://github.com/HumanSignal/labelImg
+  - former version of label studio
+
+### PixelAnnotationTool for segmentation data labeling
+  - https://github.com/abreheret/PixelAnnotationTool
+
+### fiftyone for well-prepared datasets(coco) downloading
+  - https://github.com/voxel51/fiftyone
+  - download datasets(coco) with correct format(yolo)
+
+## model training
+  - yolov5
+  - yolov8
 
 ## reference
   - yolo model

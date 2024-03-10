@@ -120,15 +120,5 @@ def format_yolov5(frame):
     return result
 
 
-# 开启Webcam，并设置为1280x720
-cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-# 调色板
-colors = [(255, 255, 0), (0, 255, 0), (0, 255, 255), (255, 0, 0)]
-
-# 开启检测循环
-
 if __name__ == '__main__':
     object_detector = detector('https://cctvn.freeway.gov.tw/abs2mjpg/bmjpg?camera=11470')
